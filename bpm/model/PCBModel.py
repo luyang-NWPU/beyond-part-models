@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.init as init
 import torch.nn.functional as F
-
+from torch.nn import init
 from .resnet import resnet50
 
 
@@ -19,7 +19,10 @@ class PCBModel(nn.Module):
     self.base = resnet50(pretrained=True, last_conv_stride=last_conv_stride)
 
     self.local_conv = nn.Conv2d(2048, local_conv_out_channels, 1)
+    init.kaiming_normal(self.local_conv.weight, mode= 'fan_out')
     self.local_bn = nn.BatchNorm2d(local_conv_out_channels)
+    init.constant(self.local_bn.weight,1)
+    init.constant(self.local_bn.bias,0)
     self.local_relu = nn.ReLU(inplace=True)
 
     self.num_stripes = num_stripes
